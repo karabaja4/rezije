@@ -3,12 +3,26 @@ const path = require('path');
 const util = require('util');
 const pdfparse = require('pdf-parse');
 const markdownpdf = require('markdown-pdf');
+const args = require('minimist')(process.argv.slice(2), { string: ["_"] });
 
-const date = new Date();
+const usage = () => {
+  console.log('rezije 1.0\n\nusage example: rezije 072021');
+  process.exit(1);
+}
+
+if (args.help || args._.length !== 1 || args._[0].length != 6) {
+  usage();
+}
+
 const current = {
-  date: date,
-  month: (date.getMonth() + 1).toString().padStart(2, "0"),
-  year: date.getFullYear().toString()
+  month: args._[0].substring(0, 2),
+  year: args._[0].substring(2, 6)
+}
+
+const cyi = parseInt(current.year);
+const cmi = parseInt(current.month);
+if (cyi < 2021 || cyi > 2100 || cmi < 1 || cmi > 12) {
+  usage();
 }
 
 const get = (lines, key, offset) => {
@@ -23,13 +37,23 @@ const get = (lines, key, offset) => {
 
 const main = async () => {
 
+  const now = new Date();
   const result = [
     `**Stanarina i režije ${current.month}/${current.year}**`,
+    `**${now.toLocaleString('hr-HR').replace('. ', '.').replace('. ', '.')}**`,
     '---',
   ];
 
   const dir = path.join('/home/igor/_private/stan', `${current.month}${current.year}`);
-  var files = await fs.promises.readdir(dir);
+
+  let files = null;
+  try {
+    files = await fs.promises.readdir(dir);
+  } catch (e) {
+    console.log(e.message);
+    process.exit(1);
+  }
+  
   const renames = {};
 
   for (let i = 0; i < files.length; i++) {
