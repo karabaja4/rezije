@@ -1,3 +1,3 @@
-# autostan
+# rezije
 
-Generate utilities summary at the end of month from bank statements.
+Generate utilities PDF summary at the end of month from bank statements.
