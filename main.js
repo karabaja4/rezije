@@ -171,12 +171,24 @@ const main = async () => {
   const atts = await fs.promises.readdir(dir);
   const attachments = [];
   for (let i = 0; i < atts.length; i++) {
-    attachments.push({ filename: atts[i], path: path.join(dir, atts[i]) });
+    attachments.push({
+      filename: atts[i],
+      path: path.join(dir, atts[i])
+    });
     console.log(chalk.blue(atts[i]));
   }
 
+  const mail = {
+    from: secret.from,
+    to: secret.to,
+    bcc: secret.bcc,
+    subject: `Stanarina i režije ${current.month}/${current.year}`,
+    text: 'Potvrde u prilogu.\n\nPozdrav, Igor'
+  };
+  console.log(mail);
   const answer = await question('Send this email? [y/N] ');
   rl.close();
+
   if (answer.trim().toLowerCase() == 'y') {
     const transport = {
       host: 'smtp.office365.com',
@@ -191,16 +203,9 @@ const main = async () => {
       }
     };
     const transporter = nodemailer.createTransport(transport);
-    const mail = {
-      from: secret.from,
-      to: secret.to,
-      bcc: secret.bcc,
-      subject: `Stanarina i režije ${current.month}/${current.year}`,
-      text: 'Potvrde u prilogu.\n\nPozdrav, Igor',
-      attachments: attachments
-    };
+    mail.attachments = attachments;
     const info = await transporter.sendMail(mail);
-    console.log(chalk.green(`Message sent to ${secret.to} (BCC: ${secret.bcc})`));
+    console.log(chalk.red(`Message sent to ${secret.to} (BCC: ${secret.bcc})\n${info.messageId}`));
   }
 }
 
