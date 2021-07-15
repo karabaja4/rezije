@@ -3,7 +3,17 @@ const path = require('path');
 const util = require('util');
 const pdfparse = require('pdf-parse');
 const markdownpdf = require('markdown-pdf');
-const args = require('minimist')(process.argv.slice(2), { string: ["_"] });
+const nodemailer = require('nodemailer');
+const chalk = require('chalk');
+const args = require('minimist')(process.argv.slice(2), { string: ['_'] });
+const secret = require('./secret.json');
+
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+const question = util.promisify(rl.question).bind(rl);
 
 const usage = () => {
   console.log('rezije 1.0\n\nusage example: rezije 072021');
@@ -143,19 +153,54 @@ const main = async () => {
   result.push('---');
   result.push(`Stanarina ${current.month}/${current.year} = 2300 kn`);
 
-  console.log(result.join('\n'));
-  console.log('Generating PDF...');
+  console.log(chalk.red(result.join('\n')));
+  process.stdout.write('Generating PDF... ');
   const to = markdownpdf().from.string(result.join('\n\n')).to;
   const generate = util.promisify(to);
   await generate(path.join(dir, `stanarina_${current.month}${current.year}.pdf`));
-  console.log('Done.');
+  console.log('done.');
 
   for (let old in renames) {
     const name = renames[old];
     const p1 = path.join(dir, old);
     const p2 = path.join(dir, name);
-    console.log(`Renaming ${old} -> ${name}`);
+    console.log(`Renaming: ${old} -> ${name}`);
     await fs.promises.rename(p1, p2);
+  }
+
+  const atts = await fs.promises.readdir(dir);
+  const attachments = [];
+  for (let i = 0; i < atts.length; i++) {
+    attachments.push({ filename: atts[i], path: path.join(dir, atts[i]) });
+    console.log(chalk.blue(atts[i]));
+  }
+
+  const answer = await question('Send this email? [y/N] ');
+  rl.close();
+  if (answer.trim().toLowerCase() == 'y') {
+    const transport = {
+      host: 'smtp.office365.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: secret.username,
+        pass: secret.password,
+      },
+      tls: {
+        ciphers: 'SSLv3'
+      }
+    };
+    const transporter = nodemailer.createTransport(transport);
+    const mail = {
+      from: secret.from,
+      to: secret.to,
+      bcc: secret.bcc,
+      subject: `Stanarina i režije ${current.month}/${current.year}`,
+      text: 'Potvrde u prilogu.\n\nPozdrav, Igor',
+      attachments: attachments
+    };
+    const info = await transporter.sendMail(mail);
+    console.log(chalk.green(`Message sent to ${secret.to} (BCC: ${secret.bcc})`));
   }
 }
 

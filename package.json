@@ -2,6 +2,8 @@
   "dependencies": {
     "pdf-parse": "^1.1.1",
     "markdown-pdf": "^10.0.0",
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.5",
+    "nodemailer": "^6.6.3",
+    "chalk": "^4.1.1"
   }
 }
