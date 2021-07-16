@@ -80,7 +80,7 @@ const main = async () => {
 
       if (lines[0] == 'Privredna banka Zagreb d.d.') {
 
-        console.log(`Processing ${filename}`);
+        console.log(`Processing: ${filename}`);
 
         const primatelj = get(lines, 'PRIMATELJAdresa primatelja', 1);
         const sifra = get(lines, 'Šifra namjeneOpis plaćanja', 1);
