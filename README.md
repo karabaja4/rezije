@@ -2,4 +2,4 @@
 
 Generate utilities PDF summary at the end of month from bank statements.
 
-![2021-07-16_02-032](https://user-images.githubusercontent.com/1043015/125872877-80dd14fe-774f-4826-9c82-73fc207180c2.png)
+![2021-07-16_02-234](https://user-images.githubusercontent.com/1043015/125873913-7454446b-7773-41d8-af01-9f1630875569.png)
