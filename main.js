@@ -136,7 +136,9 @@ const main = async () => {
           const y = parseInt(split[2]);
           const previous = new Date(y, m - 1, d);
           previous.setDate(0);
-          previous.setDate(0);
+          if (d <= 5) {
+            previous.setDate(0); // pred pocetak mjeseca
+          }
           const month = (previous.getMonth() + 1).toString().padStart(2, "0");
           const year = previous.getFullYear().toString();
           result.push(`Voda ${month}/${year} = ${cijena}`);
