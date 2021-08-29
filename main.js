@@ -181,7 +181,6 @@ const main = async () => {
   const mail = {
     from: secret.from,
     to: secret.to,
-    bcc: secret.bcc,
     subject: `Stanarina i režije ${current.month}/${current.year}`,
     text: 'Potvrde u prilogu.\n\nPozdrav, Igor'
   };
