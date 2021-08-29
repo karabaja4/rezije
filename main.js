@@ -204,7 +204,7 @@ const main = async () => {
     const transporter = nodemailer.createTransport(transport);
     mail.attachments = attachments;
     const info = await transporter.sendMail(mail);
-    console.log(chalk.red(`Message sent to ${secret.to} (BCC: ${secret.bcc})\n${info.messageId}`));
+    console.log(chalk.red(`Message sent to ${secret.to}\n${info.messageId}`));
   }
 }
 
