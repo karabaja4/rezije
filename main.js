@@ -91,13 +91,22 @@ const main = async () => {
         if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && opis.includes('NAKNADE I USLUGE ZA ')) {
           const title = parseFloat(cijena) < 30 ? 'Mala pričuva' : 'Holding';
           const date = opis.replace('NAKNADE I USLUGE ZA ', '');
-          const month = date.split('/')[0];
-          const year = date.split('/')[1];
+          let month = null;
+          let year = null;
+          if (date.includes('/')) {
+            month = date.split('/')[0];
+            year = date.split('/')[1];
+          } else if (date.length == 6) {
+            month = date.substring(0, 2);
+            year = date.substring(2, 6);
+          } else {
+            throw new Error(`can't parse date: ${date}`);
+          }
           result.push(`${title} ${month}/${year} = ${cijena}`);
           renames[filename] = `${title.toLowerCase().replace(' ', '_').replace('č', 'c')}_${month}${year}.pdf`;
         }
-        else if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && opis.includes('KN ')) {
-          const date = opis.replace('KN ', '');
+        else if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && (opis.includes('KN ') || opis.includes('KN,NUV '))) {
+          const date = opis.replace('KN ', '').replace('KN,NUV ', '');
           const month = date.split('/')[0];
           const year = date.split('/')[1];
           result.push(`Komunalna naknada ${month}/20${year} = ${cijena}`);
