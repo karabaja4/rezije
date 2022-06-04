@@ -107,8 +107,8 @@ const main = async () => {
         }
         else if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && (opis.includes('KN ') || opis.includes('KN,NUV '))) {
           const date = opis.replace('KN ', '').replace('KN,NUV ', '');
-          const month = date.split('/')[0];
-          const year = date.split('/')[1];
+          const month = `${date.substring(0, 2)}-${date.substring(3, 5)}`;
+          const year = date.slice(-2);
           result.push(`Komunalna naknada ${month}/20${year} = ${cijena}`);
           renames[filename] = `komunalna_naknada_${month}20${year}.pdf`;
         }
