@@ -166,7 +166,7 @@ const main = async () => {
 
   console.log(chalk.red(result.join('\n')));
   process.stdout.write('Generating PDF... ');
-  const to = markdownpdf().from.string(result.join('\n\n')).to;
+  const to = markdownpdf({ cssPath: path.join(__dirname, 'custom.css') }).from.string(result.join('\n\n')).to;
   const generate = util.promisify(to);
   await generate(path.join(dir, `stanarina_${current.month}${current.year}.pdf`));
   console.log('done.');
