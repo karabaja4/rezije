@@ -85,11 +85,11 @@ const main = async () => {
         const primatelj = get(lines, 'PRIMATELJAdresa primatelja', 1);
         const sifra = get(lines, 'Šifra namjeneOpis plaćanja', 1);
         const opis = get(lines, 'Šifra namjeneOpis plaćanja', 2);
-        const cijena = get(lines, 'IZNOSNaknada', 1).replace('HRK', 'kn').replace('.', ',');
+        const cijena = get(lines, 'IZNOSNaknada', 1).replace('HRK', 'kn').replace('EUR', '€').replace('.', ',');
         const vrijeme = get(lines, 'StatusDatum i vrijeme potvrde', 2);
       
         if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && opis.includes('NAKNADE I USLUGE ZA ')) {
-          const title = parseFloat(cijena) < 30 ? 'Mala pričuva' : 'Holding';
+          const title = parseFloat(cijena) < 5 ? 'Mala pričuva' : 'Holding';
           const date = opis.replace('NAKNADE I USLUGE ZA ', '');
           let month = null;
           let year = null;
@@ -162,7 +162,7 @@ const main = async () => {
   }
 
   result.push('---');
-  result.push(`Stanarina ${current.month}/${current.year} = 2300 kn`);
+  result.push(`Stanarina ${current.month}/${current.year} = 305 €`);
 
   console.log(chalk.red(result.join('\n')));
   process.stdout.write('Generating PDF... ');
