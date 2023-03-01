@@ -132,7 +132,7 @@ const main = async () => {
           renames[filename] = `struja_${month}${year}.pdf`;
         }
         else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && (opis.includes('Račun za:') || opis.includes('Racun za:'))) {
-          const dates = opis.replace('Račun za:', '').split('-');
+          const dates = opis.replace('Račun za:', '').replace('Racun za:', '').split('-');
           const month = dates[1].substring(2, 4);
           const year = dates[1].substring(4, 8);
           result.push(`Struja obračun ${month}/${year} = ${cijena}`);
