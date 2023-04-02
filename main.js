@@ -126,8 +126,8 @@ const main = async () => {
         }
         else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && opis.includes('Mjesecna novcana obveza za ')) {
           const date = opis.replace('Mjesecna novcana obveza za ', '');
-          const month = date.substring(4, 6);
-          const year = date.substring(0, 4);
+          const month = date.substring(0, 2);
+          const year = date.substring(3, 7);
           result.push(`Struja ${month}/${year} = ${cijena}`);
           renames[filename] = `struja_${month}${year}.pdf`;
         }
