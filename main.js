@@ -74,9 +74,7 @@ const main = async () => {
       const fullpath = path.join(dir, filename);
       const buffer = await fs.promises.readFile(fullpath);
       const data = await pdfparse(buffer);
-      const lines = data.text.split('\n').filter(x => {
-        return ![ '' ].includes(x);
-      });
+      const lines = data.text.split('\n').filter(x => x);
 
       if (lines[0] == 'Privredna banka Zagreb d.d.') {
 
