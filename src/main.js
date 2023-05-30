@@ -207,7 +207,9 @@ const main = async () => {
 
     // fs.promises.rename sometimes doesn't work on remote systems
     await fs.promises.copyFile(p1, p2);
-    await fs.promises.unlink(p1);
+    if (p1 !== p2) {
+      await fs.promises.unlink(p1);
+    }
   }
 
   const atts = await fs.promises.readdir(dir);
