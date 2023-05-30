@@ -205,6 +205,7 @@ const main = async () => {
     const p2 = path.join(dir, name);
     console.log(`Renaming: ${old} -> ${name}`);
     await fs.promises.rename(p1, p2);
+    await fs.promises.copyFile(p1, p2);
   }
 
   const atts = await fs.promises.readdir(dir);
