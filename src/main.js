@@ -174,7 +174,7 @@ const main = async () => {
   process.stdout.write('Generating PDF... ');
   const parsed = await marked.marked.parse(result.join('\n\n'));
   const html = parsed.replaceAll('\n', '');
-  const css = 'font-family: Arial; font-size: 16px;';
+  const css = 'font-family: Roboto; font-size: 16px;';
   const final = `<html><body style="${css}">${html}</body></html>`;
 
   const browser = await puppeteer.launch({
