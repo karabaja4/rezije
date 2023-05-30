@@ -1,9 +1,9 @@
 {
   "dependencies": {
     "pdf-parse": "1.1.1",
-    "markdown-pdf": "11.0.0",
-    "minimist": "1.2.8",
     "nodemailer": "6.9.3",
-    "chalk": "4.1.2"
+    "chalk": "4.1.2",
+    "puppeteer-core": "20.4.0",
+    "marked": "5.0.4"
   }
 }

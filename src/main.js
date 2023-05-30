@@ -2,10 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 const pdfparse = require('pdf-parse');
-const markdownpdf = require('markdown-pdf');
 const nodemailer = require('nodemailer');
+const puppeteer = require('puppeteer-core');
+const marked = require('marked');
 const chalk = require('chalk');
-const args = require('minimist')(process.argv.slice(2), { string: ['_'] });
 const config = require('./config.json');
 
 const readline = require('readline');
@@ -15,18 +15,25 @@ const rl = readline.createInterface({
 });
 const question = util.promisify(rl.question).bind(rl);
 
+marked.marked.use({
+  mangle: false,
+  headerIds: false,
+  async: true
+});
+
 const usage = () => {
-  console.log('rezije 1.0\n\nusage example: rezije 072021');
+  console.log('rezije 1.1\n\nusage example: rezije 052023');
   process.exit(1);
 }
 
-if (args.help || args._.length !== 1 || args._[0].length != 6) {
+const arg = process.argv[2];
+if (!arg || arg.length != 6) {
   usage();
 }
 
 const current = {
-  month: args._[0].substring(0, 2),
-  year: args._[0].substring(2, 6)
+  month: arg.substring(0, 2),
+  year: arg.substring(2, 6)
 }
 
 const cyi = parseInt(current.year);
@@ -163,10 +170,33 @@ const main = async () => {
   result.push(`Stanarina ${current.month}/${current.year} = 305 €`);
 
   console.log(chalk.red(result.join('\n')));
+  
   process.stdout.write('Generating PDF... ');
-  const to = markdownpdf({ cssPath: path.join(__dirname, 'custom.css') }).from.string(result.join('\n\n')).to;
-  const generate = util.promisify(to);
-  await generate(path.join(dir, `stanarina_${current.month}${current.year}.pdf`));
+  const parsed = await marked.marked.parse(result.join('\n\n'));
+  const html = parsed.replaceAll('\n', '');
+  const css = 'font-family: Arial; font-size: 16px;';
+  const final = `<html><body style="${css}">${html}</body></html>`;
+
+  const browser = await puppeteer.launch({
+    executablePath: '/usr/bin/chromium-browser',
+    headless: true
+  });
+  const page = await browser.newPage();
+  await page.setContent(final);
+  const pdf = await page.pdf({
+    format: 'A4',
+    printBackground: true,
+    margin: {
+      top: 75,
+      bottom: 75,
+      left: 75,
+      right: 75
+    }
+  });
+  await browser.close();
+
+  const stanarina = path.join(dir, `stanarina_${current.month}${current.year}.pdf`);
+  await fs.promises.writeFile(stanarina, pdf);
   console.log('done.');
 
   for (let old in renames) {
