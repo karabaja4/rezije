@@ -6,7 +6,7 @@ const markdownpdf = require('markdown-pdf');
 const nodemailer = require('nodemailer');
 const chalk = require('chalk');
 const args = require('minimist')(process.argv.slice(2), { string: ['_'] });
-const secret = require('./secret.json');
+const config = require('./config.json');
 
 const readline = require('readline');
 const rl = readline.createInterface({
@@ -54,7 +54,7 @@ const main = async () => {
     '---',
   ];
 
-  const dir = path.join('/home/igor/_private/stan', `${current.month}${current.year}`);
+  const dir = path.join(config.directory, `${current.month}${current.year}`);
 
   let files = null;
   try {
@@ -188,8 +188,8 @@ const main = async () => {
   }
 
   const mail = {
-    from: secret.from,
-    to: secret.to,
+    from: config.from,
+    to: config.to,
     subject: `Stanarina i režije ${current.month}/${current.year}`,
     text: 'Potvrde u prilogu.\n\nPozdrav, Igor'
   };
@@ -197,14 +197,14 @@ const main = async () => {
   const answer = await question('Send this email? [y/N] ');
   rl.close();
 
-  if (answer.trim().toLowerCase() == 'y') {
+  if (answer.trim().toLowerCase() === 'y') {
     const transport = {
       host: 'smtp.office365.com',
       port: 587,
       secure: false,
       auth: {
-        user: secret.username,
-        pass: secret.password,
+        user: config.username,
+        pass: config.password,
       },
       tls: {
         ciphers: 'SSLv3'
@@ -213,7 +213,7 @@ const main = async () => {
     const transporter = nodemailer.createTransport(transport);
     mail.attachments = attachments;
     const info = await transporter.sendMail(mail);
-    console.log(chalk.red(`Message sent to ${secret.to}\n${info.messageId}`));
+    console.log(chalk.red(`Message sent to ${config.to}\n${info.messageId}`));
   }
 }
 
