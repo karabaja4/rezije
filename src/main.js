@@ -205,9 +205,9 @@ const main = async () => {
     const p2 = path.join(dir, name);
     console.log(`Renaming: ${old} -> ${name}`);
 
-    // fs.promises.rename sometimes doesn't work on remote systems
-    await fs.promises.copyFile(p1, p2);
     if (p1 !== p2) {
+      // fs.promises.rename sometimes doesn't work on remote systems
+      await fs.promises.copyFile(p1, p2);
       await fs.promises.unlink(p1);
     }
   }
