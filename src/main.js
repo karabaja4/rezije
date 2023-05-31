@@ -27,7 +27,7 @@ const usage = () => {
 }
 
 const arg = process.argv[2];
-if (!arg || arg.length != 6) {
+if (!arg || arg.length !== 6) {
   usage();
 }
 
