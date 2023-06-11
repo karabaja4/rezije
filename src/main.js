@@ -57,7 +57,7 @@ const main = async () => {
   const now = new Date();
   const result = [
     `**Stanarina i režije ${current.month}/${current.year}**`,
-    `**${now.toLocaleString('hr-HR').replace('. ', '.').replace('. ', '.')}**`,
+    `**${now.toLocaleString('hr-HR', { timeZone: "Europe/Zagreb" }).replace('. ', '.').replace('. ', '.')}**`,
     '---',
   ];
 
