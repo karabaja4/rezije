@@ -167,7 +167,7 @@ const main = async () => {
   }
 
   result.push('---');
-  result.push(`Stanarina ${current.month}/${current.year} = 305 €`);
+  result.push(`Stanarina ${current.month}/${current.year} = 400 €`);
 
   console.log(chalk.red(result.join('\n')));
   
