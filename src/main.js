@@ -1,14 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const util = require('util');
+const fs = require('node:fs');
+const path = require('node:path');
+const util = require('node:util');
+const readline = require('node:readline');
+
 const pdfparse = require('pdf-parse');
 const nodemailer = require('nodemailer');
+const chalk = require('chalk');
 const puppeteer = require('puppeteer-core');
 const marked = require('marked');
-const chalk = require('chalk');
+
 const config = require('./config.json');
 
-const readline = require('readline');
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
@@ -52,6 +54,20 @@ const get = (lines, key, offset) => {
   return null;
 }
 
+const readDirSorted = async (dir) => {
+  const files = await fs.promises.readdir(dir);
+  const result = await Promise.all(files.map(async (x) => {
+    const stats = await fs.promises.stat(path.join(dir, x));
+    return {
+      name: x,
+      time: stats.mtime.getTime()
+    };
+  }));
+  return result.sort((a, b) => {
+    return a.time - b.time;
+  }).map(x => x.name);
+};
+
 const main = async () => {
 
   const now = new Date();
@@ -65,7 +81,7 @@ const main = async () => {
 
   let files = null;
   try {
-    files = await fs.promises.readdir(dir);
+    files = await readDirSorted(dir);
   } catch (e) {
     console.log(e.message);
     process.exit(1);
