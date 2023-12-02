@@ -4,6 +4,6 @@
     "nodemailer": "6.9.7",
     "chalk": "4.1.2",
     "puppeteer-core": "21.5.2",
-    "marked": "10.0.0"
+    "marked": "11.0.0"
   }
 }
