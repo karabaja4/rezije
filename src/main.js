@@ -11,6 +11,11 @@ const marked = require('marked');
 
 const config = require('./config.json');
 
+const error = (text) => {
+  console.log(chalk.red(text));
+  process.exit(1);
+}
+
 if (!config?.directory ||
     !config?.username ||
     !config?.password ||
@@ -18,8 +23,7 @@ if (!config?.directory ||
     !config?.from?.address ||
     !config?.to?.name ||
     !config?.to?.address) {
-  console.log('Invalid config.json');
-  process.exit(1);
+  error('Invalid config.json');
 }
 
 const rl = readline.createInterface({
@@ -132,7 +136,7 @@ const main = async () => {
             month = date.substring(0, 2);
             year = date.substring(2, 6);
           } else {
-            throw new Error(`can't parse date: ${date}`);
+            error(`can't parse date: ${date}`);
           }
           result.push(`${title} ${month}/${year} = ${cijena}`);
           renames[filename] = `${title.toLowerCase().replace(' ', '_').replace('č', 'c')}_${month}${year}.pdf`;
@@ -186,11 +190,15 @@ const main = async () => {
           renames[filename] = `voda_${month}${year}.pdf`;
         }
         else {
-          throw new Error(`unrecognized pdf: ${filename}`);
+          error(`unrecognized pdf: ${filename}`);
         }
 
       }
     }
+  }
+  
+  if (Object.keys(renames).length === 0) {
+    error('No files found.');
   }
 
   result.push('---');
