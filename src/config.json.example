@@ -2,12 +2,6 @@
   "directory": "/home/art/_private/stan",
   "username": "art.vandelay@vandelayindustries.com",
   "password": "mysupersecretpassword",
-  "from": {
-    "name": "Art Vandelay",
-    "address": "art.vandelay@vandelayindustries.com"
-  },
-  "to": {
-    "name": "Burt Harbinson",
-    "address": "burt.harbinson@importerexporter.com"
-  }
+  "from": { "name": "Art Vandelay", "address": "art.vandelay@vandelayindustries.com" },
+  "to": { "name": "Burt Harbinson", "address": "burt.harbinson@importerexporter.com" }
 }
