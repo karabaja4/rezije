@@ -11,6 +11,17 @@ const marked = require('marked');
 
 const config = require('./config.json');
 
+if (!config?.directory ||
+    !config?.username ||
+    !config?.password ||
+    !config?.from?.name ||
+    !config?.from?.address ||
+    !config?.to?.name ||
+    !config?.to?.address) {
+  console.log('Invalid config.json');
+  process.exit(1);
+}
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
@@ -264,7 +275,7 @@ const main = async () => {
     const transporter = nodemailer.createTransport(transport);
     mail.attachments = attachments;
     const info = await transporter.sendMail(mail);
-    console.log(chalk.red(`Message sent to ${config.to}\n${info.messageId}`));
+    console.log(chalk.red(`Message sent to ${config.to.name} <${config.to.address}>\n${info.messageId}`));
   }
 }
 
