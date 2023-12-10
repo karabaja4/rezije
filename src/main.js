@@ -9,21 +9,11 @@ const chalk = require('chalk');
 const puppeteer = require('puppeteer-core');
 const marked = require('marked');
 
-const config = require('./config.json');
+const config = require('./config').get();
 
 const error = (text) => {
   console.log(chalk.red(text));
   process.exit(1);
-}
-
-if (!config?.directory ||
-    !config?.username ||
-    !config?.password ||
-    !config?.from?.name ||
-    !config?.from?.address ||
-    !config?.to?.name ||
-    !config?.to?.address) {
-  error('Invalid config.json');
 }
 
 const rl = readline.createInterface({
