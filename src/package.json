@@ -3,8 +3,8 @@
     "pdf-parse": "1.1.1",
     "nodemailer": "6.9.7",
     "chalk": "4.1.2",
-    "puppeteer-core": "21.5.2",
-    "marked": "11.0.0",
+    "puppeteer-core": "21.6.0",
+    "marked": "11.0.1",
     "email-validator": "2.0.4"
   }
 }
