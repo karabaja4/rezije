@@ -2,20 +2,20 @@ const config = require('./config.json');
 const chalk = require('chalk');
 const validator = require('email-validator');
 
-const validateEmailObject = (obj) => {
+const isAddressObjectValid = (obj) => {
   return obj?.name && obj?.address && validator.validate(obj.address);
 }
 
-const validate = () => {
+const isValid = () => {
   return config?.directory &&
     config?.username &&
     config?.password &&
-    validateEmailObject(config?.from) &&
-    validateEmailObject(config?.to);
+    isAddressObjectValid(config?.from) &&
+    isAddressObjectValid(config?.to);
 }
 
 const get = () => {
-  if (!validate()) {
+  if (!isValid()) {
     console.log(chalk.red('Invalid config.json'));
     process.exit(1);
   }
