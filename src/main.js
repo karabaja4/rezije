@@ -166,20 +166,18 @@ const main = async () => {
           renames[filename] = `struja_obracun_${month}${year}.pdf`;
         }
         else if (primatelj.includes('VODOOPSKRBA I ODVODNJA') && sifra == 'WTER' && opis.includes('RAČUN BROJ ')) {
-          // za svaku sljedecu vodu makni sve postojece vode unatrag 1 mjesec
-          for (let j = 0; j < waters.length; j++) {
-            waters[j].date.setDate(0);
-          }
+          const id = parseInt(opis.replace('RAČUN BROJ ', ''));
           const split = vrijeme.split('.');
           const d = parseInt(split[0]);
           const m = parseInt(split[1]);
           const y = parseInt(split[2]);
-          const previous = new Date(y, m - 1, d);
-          previous.setDate(0); // postavi na zadnji dan proslog mjeseca
-          if (d <= 5) {
-            previous.setDate(0); // placeno pred pocetak mjeseca, voda nije za prosli mjesec, vec za pretprosli
-          }
-          waters.push({ date: previous, price: cijena, filename: filename });
+          const date = new Date(y, m - 1, d);
+          waters.push({
+            date: date,
+            price: cijena,
+            id: id,
+            filename: filename
+          });
         }
         else {
           error(`unrecognized pdf: ${filename}`);
@@ -187,14 +185,48 @@ const main = async () => {
       }
     }
   }
-  
-  // obradi vode
-  for (let i = 0; i < waters.length; i++) {
-    const water = waters[i];
-    const month = (water.date.getMonth() + 1).toString().padStart(2, "0");
-    const year = water.date.getFullYear().toString();
-    result.push(`Voda ${month}/${year} = ${water.price}`);
-    renames[water.filename] = `voda_${month}${year}.pdf`;
+
+  // logika za vode
+  if (waters.length > 0) {
+    
+    // poredaj vode od najnovije do najstarije
+    const sortedWaters = waters.slice().sort((a, b) => {
+      return b.id - a.id;
+    });
+    
+    const waterDate = sortedWaters[0].date; // datum placanja najnovije vode
+    if (waterDate.getDate() <= 5) {
+      waterDate.setDate(0); // placeno pred pocetak mjeseca, voda nije za prosli mjesec, vec za pretprosli
+    }
+    waterDate.setDate(0); // postavi na zadnji dan proslog mjeseca
+    
+    // obradi vode od najnovije do najstarije, pomicajuci mjesec unatrag svaku iteraciju
+    const dict = {};
+    for (let i = 0; i < sortedWaters.length; i++) {
+      
+      const water = sortedWaters[i];
+      const month = (waterDate.getMonth() + 1).toString().padStart(2, "0");
+      const year = waterDate.getFullYear().toString();
+      
+      dict[water.id] = {
+        label: `Voda ${month}/${year} = ${water.price}`,
+        rename: `voda_${month}${year}.pdf`
+      };
+      
+      // jedan mjesec unatrag
+      waterDate.setDate(0);
+    }
+    
+    // ispisi rezultate u originalnom orderu
+    for (let i = 0; i < waters.length; i++) {
+      const water = waters[i];
+      const waterResult = dict[water.id];
+      if (!waterResult) {
+        throw new Error('invalid water logic');
+      }
+      result.push(waterResult.label);
+      renames[water.filename] = waterResult.rename;
+    }
   }
   
   if (Object.keys(renames).length === 0) {
