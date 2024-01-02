@@ -1,10 +1,10 @@
 {
   "dependencies": {
     "pdf-parse": "1.1.1",
-    "nodemailer": "6.9.7",
+    "nodemailer": "6.9.8",
     "chalk": "4.1.2",
     "puppeteer-core": "21.6.1",
-    "marked": "11.1.0",
+    "marked": "11.1.1",
     "email-validator": "2.0.4"
   }
 }
