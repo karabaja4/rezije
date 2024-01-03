@@ -186,21 +186,21 @@ const main = async () => {
     }
   }
 
-  // logika za vode
+  // water logic
   if (waters.length > 0) {
     
-    // poredaj vode od najnovije do najstarije
+    // order from newest to oldest by invoice id
     const sortedWaters = waters.slice().sort((a, b) => {
       return b.id - a.id;
     });
     
-    const waterDate = sortedWaters[0].date; // datum placanja najnovije vode
+    const waterDate = sortedWaters[0].date; // payment date of most recent water
     if (waterDate.getDate() <= 5) {
-      waterDate.setDate(0); // placeno pred pocetak mjeseca, voda nije za prosli mjesec, vec za pretprosli
+      waterDate.setDate(0); // payed during beginning of the month, water is not for the previous month but the one before that
     }
-    waterDate.setDate(0); // postavi na zadnji dan proslog mjeseca
+    waterDate.setDate(0); // set to the end day of the last month
     
-    // obradi vode od najnovije do najstarije, pomicajuci mjesec unatrag svaku iteraciju
+    // process waters from newest to oldest, going back one month at a time
     const dict = {};
     for (let i = 0; i < sortedWaters.length; i++) {
       
@@ -208,19 +208,19 @@ const main = async () => {
       const month = (waterDate.getMonth() + 1).toString().padStart(2, "0");
       const year = waterDate.getFullYear().toString();
       
-      dict[water.id] = {
+      dict[water.filename] = {
         label: `Voda ${month}/${year} = ${water.price}`,
         rename: `voda_${month}${year}.pdf`
       };
       
-      // jedan mjesec unatrag
+      // one month before
       waterDate.setDate(0);
     }
     
-    // ispisi rezultate u originalnom orderu
+    // print results in the original order
     for (let i = 0; i < waters.length; i++) {
       const water = waters[i];
-      const waterResult = dict[water.id];
+      const waterResult = dict[water.filename];
       if (!waterResult) {
         throw new Error('invalid water logic');
       }
@@ -228,6 +228,7 @@ const main = async () => {
       renames[water.filename] = waterResult.rename;
     }
   }
+  // end water logic
   
   if (Object.keys(renames).length === 0) {
     error('No files found.');
