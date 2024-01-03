@@ -172,11 +172,13 @@ const main = async () => {
           const m = parseInt(split[1]);
           const y = parseInt(split[2]);
           const date = new Date(y, m - 1, d);
+          // used in water logic below
           waters.push({
             date: date,
             price: cijena,
             id: id,
-            filename: filename
+            filename: filename,
+            index: i
           });
         }
         else {
@@ -186,25 +188,30 @@ const main = async () => {
     }
   }
 
-  // water logic
+  // ----------------------- water logic -----------------------
+  // trying to guess the month since that information is not in the pdf
   if (waters.length > 0) {
     
     // order from newest to oldest by invoice id
-    const sortedWaters = waters.slice().sort((a, b) => {
+    const watersDescending = waters.slice().sort((a, b) => {
       return b.id - a.id;
     });
     
-    const waterDate = sortedWaters[0].date; // payment date of most recent water
-    if (waterDate.getDate() <= 5) {
-      waterDate.setDate(0); // payed during beginning of the month, water is not for the previous month but the one before that
-    }
-    waterDate.setDate(0); // set to the end day of the last month
+    // payment date of most recent water
+    const waterDate = watersDescending[0].date;
     
-    // process waters from newest to oldest, going back one month at a time
+    // if paid during beginning of the month, water is not for the previous month but the one before that
+    if (waterDate.getDate() <= 5) {
+      waterDate.setDate(0);
+    }
+    // set to the end day of the last month
+    waterDate.setDate(0);
+    
+    // process waters from newest to oldest, moving back one month at a time
     const dict = {};
-    for (let i = 0; i < sortedWaters.length; i++) {
+    for (let i = 0; i < watersDescending.length; i++) {
       
-      const water = sortedWaters[i];
+      const water = watersDescending[i];
       const month = (waterDate.getMonth() + 1).toString().padStart(2, "0");
       const year = waterDate.getFullYear().toString();
       
@@ -213,7 +220,7 @@ const main = async () => {
         rename: `voda_${month}${year}.pdf`
       };
       
-      // one month before
+      // go to previous month
       waterDate.setDate(0);
     }
     
@@ -224,11 +231,12 @@ const main = async () => {
       if (!waterResult) {
         throw new Error('invalid water logic');
       }
-      result.push(waterResult.label);
+      // +3 skips initial header rows, insert to original position (sorted by date modified)
+      result.splice(water.index + 3, 0, waterResult.label);
       renames[water.filename] = waterResult.rename;
     }
   }
-  // end water logic
+  // ----------------------- end water logic -----------------------
   
   if (Object.keys(renames).length === 0) {
     error('No files found.');
