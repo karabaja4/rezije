@@ -229,13 +229,13 @@ const main = async () => {
     // print results in the original order
     for (let i = 0; i < waters.length; i++) {
       const water = waters[i];
-      const waterResult = dict[water.filename];
-      if (!waterResult) {
+      const waterInfo = dict[water.filename];
+      if (!waterInfo) {
         throw new Error('invalid water logic');
       }
       // +3 skips initial header rows, insert to original position (sorted by date modified)
-      result.splice(water.index + 3, 0, waterResult.label);
-      renames[water.filename] = waterResult.rename;
+      result.splice(water.index + 3, 0, waterInfo.label);
+      renames[water.filename] = waterInfo.rename;
     }
   }
   // ----------------------- end water logic -----------------------
