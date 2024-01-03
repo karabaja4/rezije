@@ -180,6 +180,8 @@ const main = async () => {
             filename: filename,
             index: i
           });
+          // placeholder to keep renames object keys in order
+          renames[filename] = null;
         }
         else {
           error(`unrecognized pdf: ${filename}`);
