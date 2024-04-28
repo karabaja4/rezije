@@ -117,7 +117,6 @@ const main = async () => {
         const opis = get(lines, 'Šifra namjeneOpis plaćanja', 2);
         const cijena = get(lines, 'IZNOSNaknada', 1).replace('HRK', 'kn').replace('EUR', '€').replace('.', ',');
         const vrijeme = get(lines, 'StatusDatum i vrijeme potvrde', 2);
-        const pnb = get(lines, 'MODEL I POZIV NA BROJ PRIMATELJABanka primatelja', 1);
       
         if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && opis.includes('NAKNADE I USLUGE ZA ')) {
           const title = parseFloat(cijena) < 5 ? 'Mala pričuva' : 'Holding';
@@ -156,6 +155,7 @@ const main = async () => {
           renames[filename] = `plin_obracun_${num}.pdf`;
         }
         else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && (opis.includes('Mjesecna novcana obveza za ') || opis.includes('Mjesečna novčana obveza za ') || opis.includes('Akontacija'))) {
+          const pnb = get(lines, 'MODEL I POZIV NA BROJ PRIMATELJABanka primatelja', 1);
           const month = pnb.substring(18, 20);
           const year = `20${pnb.substring(16, 18)}`;
           result.push(`Struja ${month}/${year} = ${cijena}`);
