@@ -116,7 +116,6 @@ const main = async () => {
         const sifra = get(lines, 'Šifra namjeneOpis plaćanja', 1);
         const opis = get(lines, 'Šifra namjeneOpis plaćanja', 2);
         const cijena = get(lines, 'IZNOSNaknada', 1).replace('HRK', 'kn').replace('EUR', '€').replace('.', ',');
-        const vrijeme = get(lines, 'StatusDatum i vrijeme potvrde', 2);
       
         if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && opis.includes('NAKNADE I USLUGE ZA ')) {
           const title = parseFloat(cijena) < 5 ? 'Mala pričuva' : 'Holding';
@@ -170,6 +169,7 @@ const main = async () => {
         }
         else if (primatelj.includes('VODOOPSKRBA I ODVODNJA') && sifra == 'WTER' && opis.includes('RAČUN BROJ ')) {
           const id = parseInt(opis.replace('RAČUN BROJ ', ''));
+          const vrijeme = get(lines, 'StatusDatum i vrijeme potvrde', 2);
           const split = vrijeme.split('.');
           const d = parseInt(split[0]);
           const m = parseInt(split[1]);
