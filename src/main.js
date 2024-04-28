@@ -15,7 +15,7 @@ const color = (colorCode, text) => {
 };
 
 const error = (text) => {
-  console.log(color(31, text));
+  console.log(color(91, text));
   process.exit(1);
 };
 
@@ -329,7 +329,7 @@ const main = async () => {
     const transporter = nodemailer.createTransport(transport);
     mail.attachments = attachments;
     const info = await transporter.sendMail(mail);
-    console.log(color(31, `Message sent to ${config.to.name} <${config.to.address}>\n${info.messageId}`));
+    console.log(color(32, `Message sent to ${config.to.name} <${config.to.address}>\n${info.messageId}`));
   }
 };
 
