@@ -201,12 +201,12 @@ const main = async () => {
   if (waters.length > 0) {
     
     // order from newest to oldest by invoice id
-    const watersDescending = waters.slice().sort((a, b) => {
+    waters.sort((a, b) => {
       return b.id - a.id;
     });
     
     // payment date of most recent water
-    const waterDate = watersDescending[0].date;
+    const waterDate = waters[0].date;
     
     // if paid during beginning of the month, water is not for the previous month but the one before that
     if (waterDate.getDate() <= 5) {
@@ -216,9 +216,9 @@ const main = async () => {
     waterDate.setDate(0);
     
     // process waters from newest to oldest, moving back one month at a time
-    for (let i = 0; i < watersDescending.length; i++) {
+    for (let i = 0; i < waters.length; i++) {
       
-      const water = watersDescending[i];
+      const water = waters[i];
       const month = (waterDate.getMonth() + 1).toString().padStart(2, "0");
       const year = waterDate.getFullYear().toString();
   
