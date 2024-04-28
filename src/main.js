@@ -182,9 +182,10 @@ const main = async () => {
             price: cijena,
             id: id,
             filename: filename,
-            index: i
+            index: result.length
           });
-          // placeholder to keep renames object keys in order
+          // placeholder to keep results in order
+          result.push(null);
           newFilename = null;
         }
         else {
@@ -215,36 +216,19 @@ const main = async () => {
     waterDate.setDate(0);
     
     // process waters from newest to oldest, moving back one month at a time
-    const dict = {};
     for (let i = 0; i < watersDescending.length; i++) {
       
       const water = watersDescending[i];
       const month = (waterDate.getMonth() + 1).toString().padStart(2, "0");
       const year = waterDate.getFullYear().toString();
-      
-      dict[water.filename] = {
-        label: `Voda ${month}/${year} = ${water.price}`,
-        rename: `voda_${month}${year}.pdf`
-      };
+  
+      // set to original position
+      result[water.index] = `Voda ${month}/${year} = ${water.price}`;
+      const waterRename = renames.find(x => x.oldName === water.filename);
+      waterRename.newName = `voda_${month}${year}.pdf`;
       
       // go to previous month
       waterDate.setDate(0);
-    }
-    
-    // print results in the original order
-    for (let i = 0; i < waters.length; i++) {
-      const water = waters[i];
-      const waterInfo = dict[water.filename];
-      if (!waterInfo) {
-        throw new Error('invalid water logic');
-      }
-      // +3 skips initial header rows, insert to original position (sorted by date modified)
-      result.splice(water.index + 3, 0, waterInfo.label);
-      const initialRename = renames.find(x => x.oldName === water.filename);
-      if (!initialRename) {
-        throw new Error('invalid water logic');
-      }
-      initialRename.newName = waterInfo.rename;
     }
   }
   // ----------------------- end water logic -----------------------
