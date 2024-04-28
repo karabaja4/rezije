@@ -95,7 +95,7 @@ const main = async () => {
     process.exit(1);
   }
   
-  const renames = {};
+  const renames = [];
   const waters = [];
 
   for (let i = 0; i < files.length; i++) {
@@ -116,6 +116,7 @@ const main = async () => {
         const sifra = get(lines, 'Šifra namjeneOpis plaćanja', 1);
         const opis = get(lines, 'Šifra namjeneOpis plaćanja', 2);
         const cijena = get(lines, 'IZNOSNaknada', 1).replace('HRK', 'kn').replace('EUR', '€').replace('.', ',');
+        let newFilename = null;
       
         if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && opis.includes('NAKNADE I USLUGE ZA ')) {
           const title = parseFloat(cijena) < 5 ? 'Mala pričuva' : 'Holding';
@@ -132,40 +133,40 @@ const main = async () => {
             error(`can't parse date: ${date}`);
           }
           result.push(`${title} ${month}/${year} = ${cijena}`);
-          renames[filename] = `${title.toLowerCase().replace(' ', '_').replace('č', 'c')}_${month}${year}.pdf`;
+          newFilename = `${title.toLowerCase().replace(' ', '_').replace('č', 'c')}_${month}${year}.pdf`;
         }
         else if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && (opis.includes('KN ') || opis.includes('KN,NUV '))) {
           const date = opis.replace('KN ', '').replace('KN,NUV ', '');
           const month = `${date.substring(0, 2)}-${date.substring(3, 5)}`;
           const year = date.slice(-2);
           result.push(`Komunalna naknada ${month}/20${year} = ${cijena}`);
-          renames[filename] = `komunalna_naknada_${month}20${year}.pdf`;
+          newFilename = `komunalna_naknada_${month}20${year}.pdf`;
         }
         else if (primatelj.includes('GRADSKA PLINARA') && sifra == 'GASB' && opis.includes('Akontacijska rata za ')) {
           const date = opis.replace('Akontacijska rata za ', '');
           const month = date.split('.')[0];
           const year = date.split('.')[1].replace('.', '');
           result.push(`Plin ${month}/${year} = ${cijena}`);
-          renames[filename] = `plin_${month}${year}.pdf`;
+          newFilename = `plin_${month}${year}.pdf`;
         }
         else if (primatelj.includes('GRADSKA PLINARA') && sifra == 'GASB' && opis.includes('Obračun plina za ')) {
           const num = opis.replace('Obračun plina za ', '');
           result.push(`Plin obračun ${num} = ${cijena}`);
-          renames[filename] = `plin_obracun_${num}.pdf`;
+          newFilename = `plin_obracun_${num}.pdf`;
         }
         else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && (opis.includes('Mjesecna novcana obveza za ') || opis.includes('Mjesečna novčana obveza za ') || opis.includes('Akontacija'))) {
           const pnb = get(lines, 'MODEL I POZIV NA BROJ PRIMATELJABanka primatelja', 1);
           const month = pnb.substring(18, 20);
           const year = `20${pnb.substring(16, 18)}`;
           result.push(`Struja ${month}/${year} = ${cijena}`);
-          renames[filename] = `struja_${month}${year}.pdf`;
+          newFilename = `struja_${month}${year}.pdf`;
         }
         else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && (opis.includes('Račun za:') || opis.includes('Racun za:'))) {
           const dates = opis.replace('Račun za:', '').replace('Racun za:', '').split('-');
           const month = dates[1].substring(2, 4);
           const year = dates[1].substring(4, 8);
           result.push(`Struja obračun ${month}/${year} = ${cijena}`);
-          renames[filename] = `struja_obracun_${month}${year}.pdf`;
+          newFilename = `struja_obracun_${month}${year}.pdf`;
         }
         else if (primatelj.includes('VODOOPSKRBA I ODVODNJA') && sifra == 'WTER' && opis.includes('RAČUN BROJ ')) {
           const id = parseInt(opis.replace('RAČUN BROJ ', ''));
@@ -184,11 +185,12 @@ const main = async () => {
             index: i
           });
           // placeholder to keep renames object keys in order
-          renames[filename] = null;
+          newFilename = null;
         }
         else {
           error(`unrecognized pdf: ${filename}`);
         }
+        renames.push({ oldName: filename, newName: newFilename });
       }
     }
   }
@@ -238,12 +240,16 @@ const main = async () => {
       }
       // +3 skips initial header rows, insert to original position (sorted by date modified)
       result.splice(water.index + 3, 0, waterInfo.label);
-      renames[water.filename] = waterInfo.rename;
+      const initialRename = renames.find(x => x.oldName === water.filename);
+      if (!initialRename) {
+        throw new Error('invalid water logic');
+      }
+      initialRename.newName = waterInfo.rename;
     }
   }
   // ----------------------- end water logic -----------------------
   
-  if (Object.keys(renames).length === 0) {
+  if (renames.length === 0) {
     error('No files found.');
   }
 
@@ -279,13 +285,12 @@ const main = async () => {
   const stanarina = path.join(dir, `stanarina_${current.month}${current.year}.pdf`);
   await fs.promises.writeFile(stanarina, pdf);
   console.log('done.');
-
-  for (let old in renames) {
-    const name = renames[old];
-    const p1 = path.join(dir, old);
-    const p2 = path.join(dir, name);
-    console.log(`Renaming: ${old} -> ${name}`);
-
+  
+  for (let i = 0; i < renames.length; i++) {
+    const rn = renames[i];
+    const p1 = path.join(dir, rn.oldName);
+    const p2 = path.join(dir, rn.newName);
+    console.log(`Renaming: ${rn.oldName} -> ${rn.newName}`);
     if (p1 !== p2) {
       // fs.promises.rename sometimes doesn't work on remote systems
       await fs.promises.copyFile(p1, p2);
