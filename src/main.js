@@ -5,16 +5,19 @@ const readline = require('node:readline');
 
 const pdfparse = require('pdf-parse');
 const nodemailer = require('nodemailer');
-const chalk = require('chalk');
 const puppeteer = require('puppeteer-core');
 const marked = require('marked');
 
 const config = require('./config').get();
 
+const color = (colorCode, text) => {
+  return `\x1b[${colorCode}m${text}\x1b[0m`;
+};
+
 const error = (text) => {
-  console.log(chalk.red(text));
+  console.log(color(31, text));
   process.exit(1);
-}
+};
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -31,23 +34,23 @@ marked.marked.use({
 const usage = () => {
   console.log('rezije 1.1\n\nusage example: rezije 052023');
   process.exit(1);
-}
+};
 
 const arg = process.argv[2];
 if (!arg || arg.length !== 6) {
   usage();
-}
+};
 
 const current = {
   month: arg.substring(0, 2),
   year: arg.substring(2, 6)
-}
+};
 
 const cyi = parseInt(current.year);
 const cmi = parseInt(current.month);
 if (cyi < 2021 || cyi > 2100 || cmi < 1 || cmi > 12) {
   usage();
-}
+};
 
 const get = (lines, key, offset) => {
   for (let i = 0; i < lines.length; i++) {
@@ -57,7 +60,7 @@ const get = (lines, key, offset) => {
     }
   }
   return null;
-}
+};
 
 const readDirSorted = async (dir) => {
   const files = await fs.promises.readdir(dir);
@@ -114,6 +117,7 @@ const main = async () => {
         const opis = get(lines, 'Šifra namjeneOpis plaćanja', 2);
         const cijena = get(lines, 'IZNOSNaknada', 1).replace('HRK', 'kn').replace('EUR', '€').replace('.', ',');
         const vrijeme = get(lines, 'StatusDatum i vrijeme potvrde', 2);
+        const pnb = get(lines, 'MODEL I POZIV NA BROJ PRIMATELJABanka primatelja', 1);
       
         if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && opis.includes('NAKNADE I USLUGE ZA ')) {
           const title = parseFloat(cijena) < 5 ? 'Mala pričuva' : 'Holding';
@@ -151,10 +155,9 @@ const main = async () => {
           result.push(`Plin obračun ${num} = ${cijena}`);
           renames[filename] = `plin_obracun_${num}.pdf`;
         }
-        else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && opis.includes('Mjesecna novcana obveza za ')) {
-          const date = opis.replace('Mjesecna novcana obveza za ', '');
-          const month = date.substring(0, 2);
-          const year = date.substring(3, 7);
+        else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC') {
+          const month = pnb.substring(18, 20);
+          const year = `20${pnb.substring(16, 18)}`;
           result.push(`Struja ${month}/${year} = ${cijena}`);
           renames[filename] = `struja_${month}${year}.pdf`;
         }
@@ -247,7 +250,7 @@ const main = async () => {
   result.push('---');
   result.push(`Stanarina ${current.month}/${current.year} = 400 €`);
 
-  console.log(chalk.red(result.join('\n')));
+  console.log(color(31, result.join('\n')));
   
   process.stdout.write('Generating PDF... ');
   const parsed = await marked.marked.parse(result.join('\n\n'));
@@ -297,7 +300,7 @@ const main = async () => {
       filename: atts[i],
       path: path.join(dir, atts[i])
     });
-    console.log(chalk.blue(atts[i]));
+    console.log(color(34, atts[i]));
   }
 
   const mail = {
@@ -326,8 +329,8 @@ const main = async () => {
     const transporter = nodemailer.createTransport(transport);
     mail.attachments = attachments;
     const info = await transporter.sendMail(mail);
-    console.log(chalk.red(`Message sent to ${config.to.name} <${config.to.address}>\n${info.messageId}`));
+    console.log(color(31, `Message sent to ${config.to.name} <${config.to.address}>\n${info.messageId}`));
   }
-}
+};
 
 main();
