@@ -1,5 +1,4 @@
 const config = require('./config.json');
-const chalk = require('chalk');
 const validator = require('email-validator');
 
 const isAddressObjectValid = (obj) => {
@@ -16,7 +15,7 @@ const isValid = () => {
 
 const get = () => {
   if (!isValid()) {
-    console.log(chalk.red('Invalid config.json'));
+    console.log('Invalid config.json');
     process.exit(1);
   }
   return config;
