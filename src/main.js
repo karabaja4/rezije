@@ -185,6 +185,7 @@ const main = async () => {
             index: result.length
           });
           // placeholder to keep results in order
+          // result item and newFilename will be determined later based on number of waters
           result.push(null);
           newFilename = null;
         }
