@@ -207,7 +207,7 @@ const main = async () => {
     });
     
     // payment date of most recent water
-    const waterDate = waters[0].date;
+    const waterDate = new Date(waters[0].date);
     
     // if paid during beginning of the month, water is not for the previous month but the one before that
     if (waterDate.getDate() <= 5) {
