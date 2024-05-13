@@ -71,15 +71,17 @@ const readDirSorted = async (dir) => {
 
 const main = async () => {
   
-  const pg = (text) => `<p>${text}</p>`;
-  const bold = (text) => `<strong>${text}</strong>`;
-  const hr = () => '<hr>';
+  const html = {
+    p: (text) => `<p>${text}</p>`,
+    bold: (text) => `<strong>${text}</strong>`,
+    hr: () => '<hr>'
+  };
 
   const now = new Date();
   const result = [
-    pg(bold(`Stanarina i režije ${current.month}/${current.year}`)),
-    pg(bold(`${now.toLocaleString('hr-HR', { timeZone: "Europe/Zagreb" }).replace('. ', '.').replace('. ', '.')}`)),
-    hr(),
+    html.p(html.bold(`Stanarina i režije ${current.month}/${current.year}`)),
+    html.p(html.bold(`${now.toLocaleString('hr-HR', { timeZone: "Europe/Zagreb" }).replace('. ', '.').replace('. ', '.')}`)),
+    html.hr(),
   ];
 
   const dir = path.join(config.directory, `${current.month}${current.year}`);
@@ -129,40 +131,40 @@ const main = async () => {
           } else {
             error(`can't parse date: ${date}`);
           }
-          result.push(pg(`${title} ${month}/${year} = ${cijena}`));
+          result.push(html.p(`${title} ${month}/${year} = ${cijena}`));
           newFilename = `${title.toLowerCase().replace(' ', '_').replace('č', 'c')}_${month}${year}.pdf`;
         }
         else if (primatelj.includes('ZAGREBAČKI HOLDING') && sifra == '-' && (opis.includes('KN ') || opis.includes('KN,NUV '))) {
           const date = opis.replace('KN ', '').replace('KN,NUV ', '');
           const month = `${date.substring(0, 2)}-${date.substring(3, 5)}`;
           const year = date.slice(-2);
-          result.push(pg(`Komunalna naknada ${month}/20${year} = ${cijena}`));
+          result.push(html.p(`Komunalna naknada ${month}/20${year} = ${cijena}`));
           newFilename = `komunalna_naknada_${month}20${year}.pdf`;
         }
         else if (primatelj.includes('GRADSKA PLINARA') && sifra == 'GASB' && opis.includes('Akontacijska rata za ')) {
           const date = opis.replace('Akontacijska rata za ', '');
           const month = date.split('.')[0];
           const year = date.split('.')[1].replace('.', '');
-          result.push(pg(`Plin ${month}/${year} = ${cijena}`));
+          result.push(html.p(`Plin ${month}/${year} = ${cijena}`));
           newFilename = `plin_${month}${year}.pdf`;
         }
         else if (primatelj.includes('GRADSKA PLINARA') && sifra == 'GASB' && opis.includes('Obračun plina za ')) {
           const num = opis.replace('Obračun plina za ', '');
-          result.push(pg(`Plin obračun ${num} = ${cijena}`));
+          result.push(html.p(`Plin obračun ${num} = ${cijena}`));
           newFilename = `plin_obracun_${num}.pdf`;
         }
         else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && (opis.includes('Mjesecna novcana obveza za ') || opis.includes('Mjesečna novčana obveza za ') || opis.includes('Akontacija'))) {
           const pnb = get(lines, 'MODEL I POZIV NA BROJ PRIMATELJABanka primatelja', 1);
           const month = pnb.substring(18, 20);
           const year = `20${pnb.substring(16, 18)}`;
-          result.push(pg(`Struja ${month}/${year} = ${cijena}`));
+          result.push(html.p(`Struja ${month}/${year} = ${cijena}`));
           newFilename = `struja_${month}${year}.pdf`;
         }
         else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && (opis.includes('Račun za:') || opis.includes('Racun za:'))) {
           const dates = opis.replace('Račun za:', '').replace('Racun za:', '').split('-');
           const month = dates[1].substring(2, 4);
           const year = dates[1].substring(4, 8);
-          result.push(pg(`Struja obračun ${month}/${year} = ${cijena}`));
+          result.push(html.p(`Struja obračun ${month}/${year} = ${cijena}`));
           newFilename = `struja_obracun_${month}${year}.pdf`;
         }
         else if (primatelj.includes('VODOOPSKRBA I ODVODNJA') && sifra == 'WTER' && opis.includes('RAČUN BROJ ')) {
@@ -221,7 +223,7 @@ const main = async () => {
       const year = waterDate.getFullYear().toString();
   
       // set to original position
-      result[water.index] = pg(`Voda ${month}/${year} = ${water.price}`);
+      result[water.index] = html.p(`Voda ${month}/${year} = ${water.price}`);
       const waterRename = renames.find(x => x.oldName === water.filename);
       waterRename.newName = `voda_${month}${year}.pdf`;
       
@@ -235,8 +237,8 @@ const main = async () => {
     error('No files found.');
   }
 
-  result.push(hr());
-  result.push(pg(`Stanarina ${current.month}/${current.year} = 400 €`));
+  result.push(html.hr());
+  result.push(html.p(`Stanarina ${current.month}/${current.year} = 400 €`));
 
   console.log(color(31, result.join('\n')));
   
