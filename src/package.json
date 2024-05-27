@@ -2,7 +2,7 @@
   "dependencies": {
     "pdf-parse": "1.1.1",
     "nodemailer": "6.9.13",
-    "puppeteer-core": "22.8.0",
+    "puppeteer-core": "22.10.0",
     "email-validator": "2.0.4"
   }
 }
