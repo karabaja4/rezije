@@ -153,7 +153,7 @@ const main = async () => {
           result.push(html.p(`Plin obračun ${num} = ${cijena}`));
           newFilename = `plin_obracun_${num}.pdf`;
         }
-        else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && (opis.includes('Mjesecna novcana obveza za ') || opis.includes('Mjesečna novčana obveza za ') || opis.includes('Akontacija'))) {
+        else if (primatelj.includes('HEP ELEKTRA') && sifra == 'ELEC' && (opis.includes('MNO') || opis.includes('Akontacija'))) {
           const pnb = get(lines, 'MODEL I POZIV NA BROJ PRIMATELJABanka primatelja', 1);
           const month = pnb.substring(18, 20);
           const year = `20${pnb.substring(16, 18)}`;
