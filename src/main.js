@@ -253,7 +253,8 @@ const main = async () => {
 
   const browser = await puppeteer.launch({
     executablePath: '/usr/bin/chromium-browser',
-    headless: 'shell'
+    headless: 'shell',
+    args: [ '--disable-gpu' ]
   });
   const page = await browser.newPage();
   await page.setContent(final);
