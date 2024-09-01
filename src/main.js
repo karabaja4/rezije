@@ -243,7 +243,7 @@ const main = async () => {
   }
 
   result.push(html.hr());
-  result.push(html.p(`Stanarina ${current.month}/${current.year} = 400 €`));
+  result.push(html.p(`Stanarina ${current.month}/${current.year} = polog`));
 
   console.log(color(31, result.join('\n')));
   
