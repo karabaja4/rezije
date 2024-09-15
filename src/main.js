@@ -242,8 +242,8 @@ const main = async () => {
     error('No files found.');
   }
 
-  result.push(html.hr());
-  result.push(html.p(`Stanarina ${current.month}/${current.year} = polog`));
+  //result.push(html.hr());
+  //result.push(html.p(`Stanarina ${current.month}/${current.year} = polog`));
 
   console.log(color(31, result.join('\n')));
   
@@ -269,7 +269,7 @@ const main = async () => {
   });
   await browser.close();
 
-  const stanarina = path.join(dir, `stanarina_${current.month}${current.year}.pdf`);
+  const stanarina = path.join(dir, `rezije_${current.month}${current.year}.pdf`);
   await fs.promises.writeFile(stanarina, pdf);
   console.log('done.');
   
