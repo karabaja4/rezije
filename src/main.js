@@ -79,7 +79,7 @@ const main = async () => {
 
   const now = new Date();
   const result = [
-    html.p(html.bold(`Stanarina i režije ${current.month}/${current.year}`)),
+    html.p(html.bold(`Režije ${current.month}/${current.year}`)),
     html.p(html.bold(`${now.toLocaleString('hr-HR', { timeZone: "Europe/Zagreb" }).replace('. ', '.').replace('. ', '.')}`)),
     html.hr(),
   ];
