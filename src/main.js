@@ -321,7 +321,7 @@ const main = async () => {
     //const transporter = nodemailer.createTransport(transport);
     mail.attachments = attachments;
     //const info = await transporter.sendMail(mail);
-    console.log(color(32, `Message NOT sent to ${config.to.name} <${config.to.address}>\n${info.messageId}`));
+    console.log(color(32, `Message NOT sent to ${config.to.name} <${config.to.address}>\n(messageId)`));
   }
 };
 
