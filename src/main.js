@@ -4,7 +4,7 @@ const util = require('node:util');
 const readline = require('node:readline');
 
 const pdfparse = require('pdf-parse');
-const nodemailer = require('nodemailer');
+//const nodemailer = require('nodemailer');
 const puppeteer = require('puppeteer-core');
 
 const config = require('./config').get();
@@ -79,7 +79,7 @@ const main = async () => {
 
   const now = new Date();
   const result = [
-    html.p(html.bold(`Režije ${current.month}/${current.year}`)),
+    html.p(html.bold(`Stanarina i režije ${current.month}/${current.year}`)),
     html.p(html.bold(`${now.toLocaleString('hr-HR', { timeZone: "Europe/Zagreb" }).replace('. ', '.').replace('. ', '.')}`)),
     html.hr(),
   ];
@@ -242,8 +242,8 @@ const main = async () => {
     error('No files found.');
   }
 
-  //result.push(html.hr());
-  //result.push(html.p(`Stanarina ${current.month}/${current.year} = polog`));
+  result.push(html.hr());
+  result.push(html.p(`Stanarina ${current.month}/${current.year} = 400 €`));
 
   console.log(color(31, result.join('\n')));
   
@@ -269,7 +269,7 @@ const main = async () => {
   });
   await browser.close();
 
-  const stanarina = path.join(dir, `rezije_${current.month}${current.year}.pdf`);
+  const stanarina = path.join(dir, `stanarina_${current.month}${current.year}.pdf`);
   await fs.promises.writeFile(stanarina, pdf);
   console.log('done.');
   
@@ -318,10 +318,10 @@ const main = async () => {
         ciphers: 'SSLv3'
       }
     };
-    const transporter = nodemailer.createTransport(transport);
+    //const transporter = nodemailer.createTransport(transport);
     mail.attachments = attachments;
-    const info = await transporter.sendMail(mail);
-    console.log(color(32, `Message sent to ${config.to.name} <${config.to.address}>\n${info.messageId}`));
+    //const info = await transporter.sendMail(mail);
+    console.log(color(32, `Message NOT sent to ${config.to.name} <${config.to.address}>\n${info.messageId}`));
   }
 };
 
